@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="fragment_title">
+        <item>ScanList</item>
+        <item>Advertise</item>
+    </string-array>
+
+    <string-array name="fragment_control_title">
+        <item>Control</item>
+        <item>Log</item>
+    </string-array>
+</resources>
