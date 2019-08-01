@@ -34,4 +34,5 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0-beta02'
     implementation 'com.google.android.material:material:1.1.0-alpha08'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
+//    implementation 'com.qmuiteam:qmui:1.4.0'
 }

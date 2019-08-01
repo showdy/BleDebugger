@@ -99,28 +99,59 @@ public class BleControlFragment extends Fragment {
         mConnectionHelper.connect(mAddress);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mConnectionHelper.disconnect();
+        mConnectionHelper.close();
+    }
+
     private BleConnectionHelper.BleConnectListener mOnBleConnectListener = new BleConnectionHelper.BleConnectListener() {
         @Override
         public void onConnectionSuccess() {
-            mRefreshLayout.setEnabled(true);
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setEnabled(true);
+                }
+            });
+
         }
         @Override
         public void onConnectionFail() {
-            mRefreshLayout.setEnabled(false);
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setEnabled(false);
+                }
+            });
+
         }
 
         @Override
         public void disConnection() {
-            mRefreshLayout.setEnabled(false);
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setEnabled(false);
+                }
+            });
+
         }
 
         @Override
         public void discoveredServices() {
-            if (mRefreshLayout.isRefreshing()) {
-                mRefreshLayout.setRefreshing(false);
-            }
-            mGattServiceList.addAll(mConnectionHelper.getGattServiceList());
-            mControlAdapter.notifyDataSetChanged();
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mRefreshLayout.isRefreshing()) {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                    mGattServiceList.clear();
+                    mGattServiceList.addAll(mConnectionHelper.getGattServiceList());
+                    mControlAdapter.notifyDataSetChanged();
+                }
+            });
         }
 
         @Override

@@ -1,5 +1,6 @@
 package com.shwody.bledebugger.adapter;
 
+import android.bluetooth.BluetoothAssignedNumbers;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanRecord;
 import android.content.Context;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.bluetooth.BluetoothAssignedNumbers.*;
 
 public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHolder> {
 
@@ -172,15 +175,15 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
                 int key = manuDatas.keyAt(i);
                 builder.append("Company:");
                 switch (key) {
-                    case 0x4C:
+                    case APPLE:
                         holder.ivIcon.setImageResource(R.drawable.apple);
                         builder.append("Apple,Inc.").append("\r\n");
                         break;
-                    case 0x59:
+                    case NORDIC_SEMICONDUCTOR:
                         holder.ivIcon.setImageResource(R.drawable.ic_device_nordic);
                         builder.append("Nordic Semiconductor ASC").append("\r\n");
                         break;
-                    case 0x06:
+                    case MICROSOFT:
                         holder.ivIcon.setImageResource(R.drawable.windows);
                         builder.append("Microsoft.").append("\r\n");
                         break;

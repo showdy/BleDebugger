@@ -23,6 +23,7 @@ import com.shwody.bledebugger.bean.BleDevice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 
@@ -104,6 +105,7 @@ public class BleScanHelper {
             public void run() {
                 Log.d(TAG, "run: start scan");
                 if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                    Objects.requireNonNull(mLeScanner, "BluetoothLeScanner is null");
                     mLeScanner.startScan(buildScanFilters(), buildScanSetting(), mScanCallback);
                 } else {
                     mBluetoothAdapter.startLeScan(mLeScanCallback);

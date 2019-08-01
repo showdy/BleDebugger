@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ import static android.bluetooth.BluetoothGattCharacteristic.*;
 
 public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.ViewHolder> {
 
-
+    private static final String TAG = "BleControlAdapter";
     private Context mContext;
     private List<BluetoothGattService> mGattServiceList;
 
@@ -92,10 +93,13 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
             }
             UUID uuid = gattService.getUuid();
             //设置服务名
-            tvServiceName.setText("ServiceName: " + GattAttributes.lookup(uuid.toString(), "Unknown service"));
+            tvServiceName.setText(GattAttributes.lookup(uuid.toString(), "Unknown Service"));
             //设置uuid
             tvServiceUuid.setText("UUID: " + uuid.toString());
             //遍历每个service下的characteristic
+
+            llCharacteristic.removeAllViews();
+
             List<BluetoothGattCharacteristic> characteristics = gattService.getCharacteristics();
             for (BluetoothGattCharacteristic characteristic : characteristics) {
                 addCharacteristicLayout(characteristic);
@@ -112,7 +116,8 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
 
             LinearLayout layoutDescriptor = view.findViewById(R.id.layout_descriptor);
 
-
+            ivRead.setVisibility(View.INVISIBLE);
+            ivWrite.setVisibility(View.INVISIBLE);
             //设置characteristic名称
             tvCharacteristic.setText("Characteristic");
             //设置characteristic uuid
@@ -120,18 +125,19 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
             int properties = characteristic.getProperties();
             String propertiesName = getPropertiesName(properties);
             //设置characteristic properties
-            tvProperties.setText(propertiesName);
-            if (propertiesName.contains("Read")) {
+            tvProperties.setText("PROPERTIES:" + propertiesName);
+            if (propertiesName.contains("READ")) {
                 ivRead.setVisibility(View.VISIBLE);
                 ivRead.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (mListener != null) {
-                            mListener.onCharacterisitcRead(characteristic, v);
+                            mListener.onCharacteristicRead(characteristic, v);
                         }
                     }
                 });
-            } else if (propertiesName.contains("Write no response") || propertiesName.contains("Write")) {
+            }
+            if (propertiesName.contains("WRITE NO RESPONSE") || propertiesName.contains("WRITE")) {
                 ivWrite.setVisibility(View.VISIBLE);
                 ivWrite.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -154,7 +160,7 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
                 TextView tvDesUuid = descriptorView.findViewById(R.id.tv_descriptor_uuid);
                 ImageView ivDescRead = descriptorView.findViewById(R.id.iv_descriptor_bot);
                 ImageView ivDescWrite = descriptorView.findViewById(R.id.iv_descriptor_top);
-                tvDescriptorName.setText("Characteristic");
+                tvDescriptorName.setText("Descriptor");
                 tvDesUuid.setText("UUID:" + descriptor.getUuid().toString());
                 ivDescRead.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -174,30 +180,35 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
                 });
                 layoutDescriptor.addView(descriptorView);
             }
-
-
+            llCharacteristic.addView(view);
         }
 
         private String getPropertiesName(int properties) {
-
+            Log.d(TAG, "getPropertiesName: " + properties);
             StringBuilder builder = new StringBuilder();
-
             if ((properties & PROPERTY_BROADCAST) != 0) {
-                builder.append("Broadcast,");
-            } else if ((properties & PROPERTY_READ) != 0) {
-                builder.append("Read,");
-            } else if ((properties & PROPERTY_WRITE_NO_RESPONSE) != 0) {
-                builder.append("Write no response,");
-            } else if ((properties & PROPERTY_WRITE) != 0) {
-                builder.append("Write,");
-            } else if ((properties & PROPERTY_NOTIFY) != 0) {
-                builder.append("Notify,");
-            } else if ((properties & PROPERTY_INDICATE) != 0) {
-                builder.append("Indicate,");
-            } else if ((properties & PROPERTY_SIGNED_WRITE) != 0) {
-                builder.append("Signed Write,");
-            } else if ((properties & PROPERTY_EXTENDED_PROPS) != 0) {
-                builder.append("Extend Props,");
+                builder.append("BROADCAST,");
+            }
+            if ((properties & PROPERTY_READ) != 0) {
+                builder.append("READ,");
+            }
+            if ((properties & PROPERTY_WRITE_NO_RESPONSE) != 0) {
+                builder.append("WRITE NO RESPONSE,");
+            }
+            if ((properties & PROPERTY_WRITE) != 0) {
+                builder.append("WRITE,");
+            }
+            if ((properties & PROPERTY_NOTIFY) != 0) {
+                builder.append("NOTIFY,");
+            }
+            if ((properties & PROPERTY_INDICATE) != 0) {
+                builder.append("INDICATE,");
+            }
+            if ((properties & PROPERTY_SIGNED_WRITE) != 0) {
+                builder.append("SIGNED WRITE,");
+            }
+            if ((properties & PROPERTY_EXTENDED_PROPS) != 0) {
+                builder.append("EXTENDED PROPS,");
             }
             if (builder.toString().trim().length() > 0) {
                 return builder.substring(0, builder.length() - 1);
@@ -207,7 +218,7 @@ public class BleControlAdapter extends RecyclerView.Adapter<BleControlAdapter.Vi
     }
 
     public interface OnGattServiceListener {
-        void onCharacterisitcRead(BluetoothGattCharacteristic characteristic, View view);
+        void onCharacteristicRead(BluetoothGattCharacteristic characteristic, View view);
 
         void onCharacteristicWrite(BluetoothGattCharacteristic characteristic, View v);
 
